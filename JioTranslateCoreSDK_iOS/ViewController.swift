@@ -36,8 +36,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        let jwt = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1LTBhYmI5ZjJmLTYzNDctNDRhOS04ZGJkLWI2NDE3OWQzMTYzZSIsInRva2VuSWQiOiJvdC0wMmJlOGYwZi0xMGIyLTRkMmEtOTQ2Mi00ZmRlMTkzMDk3NGYiLCJzb3VyY2UiOiJtb2JpbGUiLCJpYXQiOjE3MTYxODUxNDAsImV4cCI6MTcxNjI3MTU0MH0.cxZNGKjvaJkI-ElkfeFnkkPcDCMk6mcdWc9PceCHgxykswBmCYQJwZkcI2P3xAGMEl4NHajFG1QGHYEo_WWK4MCeuma5mj6oUY-fKEf9QWzcGBpHeF4H_4nqiju5JcqeLWjpf---IH53aR0vfXGK8onF1Et6SPt0VA5UqaPeCXk"
-        let userId = "u-0abb9f2f-6347-44a9-8dbd-b64179d3163e"
+        let jwt = "Add your JWT here"
+        let userId = "Add your userId"
         
         JioTranslateManager.shared.configure(server: .sit, jwt: jwt, userId: userId, gender: "male")
         
@@ -62,17 +62,26 @@ class ViewController: UIViewController {
 
         speakerLanguageBackView.addGestureRecognizer(languageTapAction)
         listenerLanguageBackView.addGestureRecognizer(languageTapAction2)
+        
+        setUpSession()
     }
     
     @IBAction func didPressSpeakerButtonAction(_ sender: UIButton) {
-        self.speakerMicButton.isSelected = !sender.isSelected
-        if self.speakerMicButton.isSelected {
-            startRecording()
-            print("recording started")
-        } else {
-            audioRecorder.stopRecording()
-            print("recording stopped")
-        }
+        checkRecordingPermissions(completion: { granted in
+            guard granted else {
+                return
+            }
+            DispatchQueue.main.async {
+                self.speakerMicButton.isSelected = !sender.isSelected
+                if self.speakerMicButton.isSelected {
+                    self.startRecording()
+                    print("recording started")
+                }  else {
+                    self.audioRecorder.stopRecording()
+                    print("recording stopped")
+                }
+            }
+        })
     }
     
     @IBAction func didPressSynthesisToSpeakerButtonAction(_ sender: UIButton) {
@@ -233,5 +242,61 @@ extension ViewController {
         @unknown default:
             showErrorAlert(withMessage: "Something went wrong, please try again!")
         }
+    }
+    
+    func checkRecordingPermissions(completion: @escaping (Bool) -> Void) {
+        switch AVAudioSession.sharedInstance().recordPermission {
+        case .granted:
+            completion(true)
+            print("Permission granted")
+        case .denied:
+            completion(false)
+            DispatchQueue.main.async {[weak self] in
+                self?.showMicroPhoneError()
+            }
+            print("Permission denied")
+        case .undetermined:
+            AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                completion(granted)
+            }
+            print("Request permission here")
+        @unknown default:
+            completion(false)
+            print("Unknown case")
+        }
+        return
+    }
+    
+    func showMicroPhoneError() {
+        let kBundleName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? "JioTranslate"
+        let errorAlert = UIAlertController(title: nil, message: "\(kBundleName) doesn't have permission to use the microphone, please change privacy settings and restart the app", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ok", style: .default) { _ in}
+        let settingsAction = UIAlertAction(title: "Settings", style: .default, handler: { _ in
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        })
+        errorAlert.addAction(okAction)
+        errorAlert.addAction(settingsAction)
+        
+        if let rootViewController = UIApplication.shared.windows.first?.rootViewController {
+            rootViewController.present(errorAlert, animated: true, completion: nil)
+        }
+    }
+    
+    func setUpSession() {
+        let supportedCategory: AVAudioSession.CategoryOptions = [
+            .defaultToSpeaker,
+            .allowBluetooth,
+            .allowBluetoothA2DP,
+            .allowAirPlay,
+            .duckOthers,
+            .interruptSpokenAudioAndMixWithOthers
+        ]
+        do {
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setCategory(.playAndRecord, mode: AVAudioSession.Mode.default, options: supportedCategory)
+            try audioSession.setActive(true)
+        } catch {}
     }
 }
