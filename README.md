@@ -49,7 +49,7 @@ Please add below permissions keys to your `Info.plist` file with proper descript
 
 ```swift
 <key>NSMicrophoneUsageDescription</key>
-<string>Allow access to mic for meetings</string>
+<string>App needs microphone access to record your audio and translate</string>
 ```
 
 ### Add SDK
