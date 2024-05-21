@@ -128,7 +128,7 @@ Use this function to translate written text into spoken language.
 | Property Name | Type  | Description  |
 | ------- | --- | --- |
 | inputText | String | Input text to translate |
-| inputLanguage | SupportedLanguage | Language name of the input text, Ex: Ex: 'English', 'Telugu' |
+| inputLanguage | SupportedLanguage | Language name of the input text, Ex: 'English', 'Telugu' |
 | translateEngine | TranlsateEngine | .engine1, .engine2, .engine3 |
 | gender | String | 'male' or 'female' |
 | completion | Result<String, CustomError> | .success(let audioContent), .failure(let error) |
