@@ -59,7 +59,7 @@ Please add below permissions keys to your `Info.plist` file with proper descript
 Please add below pod to your Podfile and run command `pod install --repo-update --verbose`.
 
 ```ruby
-pod 'JioTranslateCoreSDKiOS', '1.0.0-alpha.3'
+pod 'JioTranslateCoreSDKiOS', '1.0.0-alpha.4'
 ```
 
 ### Import SDK
