@@ -10,8 +10,8 @@ import JioTranslateCoreSDKiOS
 
 class LanguageVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
-    var languages: [SupportedLanguage] = SupportedLanguage.allCases
-    
+    var languages: [SupportedLanguage] = JioTranslateManager.shared.getSupportedLanguages()
+
     var didSelectLanguage: ((SupportedLanguage) -> Void)?
     var selectedLanguageIndex: Int?
 
@@ -102,7 +102,7 @@ class LanguageCell: UITableViewCell {
     }
     
     func configure(with language: SupportedLanguage, isSelected: Bool) {
-        languageLabel.text = language.rawValue
+        languageLabel.text = language.languageName
         if isSelected {
             backgroundColor = .lightGray // Set your desired color for selected cell
         } else {

@@ -30,8 +30,8 @@ class ViewController: UIViewController {
     
     private var player: AVAudioPlayer?
     private(set) var isSpeechStopped: Bool = false
-    private var sourceLanguage: SupportedLanguage = .english
-    private var translateLanguage: SupportedLanguage = .hindi
+    private var sourceLanguage: SupportedLanguage = SupportedLanguage(languageName: "English")
+    private var translateLanguage: SupportedLanguage = SupportedLanguage(languageName: "Hindi")
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,7 +39,7 @@ class ViewController: UIViewController {
         let jwt = "Add your JWT here"
         let userId = "Add your userId"
         
-        JioTranslateManager.shared.configure(server: .sit, jwt: jwt, userId: userId, gender: "male")
+        JioTranslateManager.shared.configure(server: .sit, jwt: jwt, userId: userId)
         
         translationTextView.layer.borderColor = UIColor.systemBlue.cgColor
         translationTextView.layer.cornerRadius = 16
@@ -51,11 +51,13 @@ class ViewController: UIViewController {
         textView.layer.borderWidth = 1
         textView.placeholder = "Input Text"
         
-        speakerMicButton.setTitle("Start Recording", for: .normal)
-        speakerMicButton.setTitle("Stop Recording", for: .selected)
+        speakerMicButton.setTitle("Start Speech To Text", for: .normal)
+        speakerMicButton.setTitle("Stop Speech To Text", for: .selected)
         
-        synthesisToSpeaker.setTitle("Synthesis To Speaker ", for: .normal)
-        synthesisToSpeaker.setTitle("Stop Speaker", for: .selected)
+        translateTextButton.setTitle("Start Text Translation", for: .normal)
+
+        synthesisToSpeaker.setTitle("Start Text To Speech", for: .normal)
+        synthesisToSpeaker.setTitle("Stop Text To Speech", for: .selected)
         
         let languageTapAction = UITapGestureRecognizer(target: self, action: #selector(didTapLanguageActionFrom(_:)))
         let languageTapAction2 = UITapGestureRecognizer(target: self, action: #selector(didTapLanguageActionTo(_:)))
@@ -63,7 +65,7 @@ class ViewController: UIViewController {
         speakerLanguageBackView.addGestureRecognizer(languageTapAction)
         listenerLanguageBackView.addGestureRecognizer(languageTapAction2)
         
-        setUpSession()
+        setUpAudioSession()
     }
     
     @IBAction func didPressSpeakerButtonAction(_ sender: UIButton) {
@@ -86,6 +88,14 @@ class ViewController: UIViewController {
     
     @IBAction func didPressSynthesisToSpeakerButtonAction(_ sender: UIButton) {
         self.synthesisToSpeaker.isSelected = !sender.isSelected
+        
+        let finalText = textView.text.replacingOccurrences(of: "\n", with: "")
+        let isTextEmpty = finalText.replacingOccurrences(of: " ", with: "").isEmpty
+        
+        if isTextEmpty {
+            self.showErrorAlert(withMessage: "Pleae enter Input Text for Text to Speech.")
+            return
+        }
         if self.synthesisToSpeaker.isSelected {
             textToSpeech()
         } else {
@@ -99,7 +109,7 @@ class ViewController: UIViewController {
         let isTextEmpty = finalText.replacingOccurrences(of: " ", with: "").isEmpty
         
         if !isTextEmpty {
-            JioTranslateManager.shared.translateText(inputText: textView.text ?? "", inputLanguage: sourceLanguage, translationLanguage: translateLanguage) { [weak self] result in
+            JioTranslateManager.shared.startTextTranslation(inputText: textView.text ?? "", inputLanguage: sourceLanguage, translationLanguage: translateLanguage, translateEngine: .engine1) { [weak self] result in
                 switch result {
                 case .success(let translatedText):
                     guard let self = self else { return }
@@ -108,6 +118,8 @@ class ViewController: UIViewController {
                     self?.showErrorAlert(for: error)
                 }
             }
+        } else {
+            showErrorAlert(withMessage: "Input Text is empty, please enter input text")
         }
     }
     
@@ -115,27 +127,49 @@ class ViewController: UIViewController {
         let languageVC = LanguageVC()
         let navVC = UINavigationController(rootViewController: languageVC)
         languageVC.didSelectLanguage = { language in
+            if language.languageName == self.translateLanguage.languageName {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    self.showErrorAlert(withMessage: "The Input language and the Translate language should not be the same.")
+                }
+                return
+            }
             self.sourceLanguage = language
-            self.speakerLanguageLabel.text = language.rawValue
+            self.speakerLanguageLabel.text = language.languageName
             // Handle the selected language
-            print("Selected Language: \(language.rawValue)")
+            print("Selected Source Language: \(language.languageName)")
         }
         navVC.modalPresentationStyle = .overCurrentContext
-        present(navVC, animated: true, completion: nil)
+        
+        if !languageVC.languages.isEmpty {
+            present(navVC, animated: true, completion: nil)
+        } else {
+            showErrorAlert(withMessage: "Language list is not available at the moment. Please try again.")
+        }
     }
     
     @objc func didTapLanguageActionTo(_ sender: UITapGestureRecognizer) {
         let languageVC = LanguageVC()
         let navVC = UINavigationController(rootViewController: languageVC)
         languageVC.didSelectLanguage = { language in
+            if language.languageName == self.sourceLanguage.languageName {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    self.showErrorAlert(withMessage: "The Input language and the Translate language should not be the same.")
+                }
+                return
+            }
             self.translateLanguage = language
-            self.listenerLanguageLabel.text = language.rawValue
+            self.listenerLanguageLabel.text = language.languageName
 
             // Handle the selected language
-            print("Selected Language: \(language.rawValue)")
+            print("Selected Translate Language: \(language.languageName)")
         }
         navVC.modalPresentationStyle = .overCurrentContext
-        present(navVC, animated: true, completion: nil)
+        
+        if !languageVC.languages.isEmpty {
+            present(navVC, animated: true, completion: nil)
+        } else {
+            showErrorAlert(withMessage: "Language list is not available at the moment. Please try again.")
+        }
     }
 }
 
@@ -146,7 +180,7 @@ extension ViewController {
         
         audioRecorder.startRecording(url: audioFileURL, maxRecordingTime: 59.0, maxSilenceTime: 0.8, ignoreSilence: true, enableLiveTranslation: false) { [weak self] in
             
-            JioTranslateManager.shared.startTextTranslationRecording(audioURL: audioFileURL, inputLanguage: self?.sourceLanguage ?? .english) { result in
+            JioTranslateManager.shared.startSpeechToText(audioFilePath: audioFileURL, inputLanguage: self?.sourceLanguage ?? SupportedLanguage(languageName: "English"), translateEngine: .engine1) { result in
                 switch result {
                 case .success(let text):
                     let finalText = text.replacingOccurrences(of: "\n", with: "")
@@ -167,7 +201,7 @@ extension ViewController {
 // MARK: - Text to Speech
 extension ViewController {
     func textToSpeech() {
-        JioTranslateManager.shared.synthesisToSpeaker(inputText: self.translationTextView.text, inputLanguage: translateLanguage) { [weak self] result in
+        JioTranslateManager.shared.startTextToSpeech(inputText: self.textView.text, inputLanguage: sourceLanguage, translateEngine: .engine1, gender: .male) { [weak self] result in
             switch result {
             case .success(let text):
                 let finalText = text.replacingOccurrences(of: "\n", with: "")
@@ -284,7 +318,7 @@ extension ViewController {
         }
     }
     
-    func setUpSession() {
+    func setUpAudioSession() {
         let supportedCategory: AVAudioSession.CategoryOptions = [
             .defaultToSpeaker,
             .allowBluetooth,

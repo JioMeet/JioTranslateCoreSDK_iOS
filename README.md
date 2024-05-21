@@ -21,6 +21,8 @@ JioTranslate CoreSDK iOS Demo App
 
 In this documentation, we'll guide you through the process of installation, Let's get started on your journey to Break Language barriers with translation of any language into your native tongue with JioTranslate CoreSDK!
 
+<img src="./Images/sampleApp.png" alt="image info" width="300" height="650">
+
 ---
 
 ## Features
@@ -57,7 +59,7 @@ Please add below permissions keys to your `Info.plist` file with proper descript
 Please add below pod to your Podfile and run command `pod install --repo-update --verbose`.
 
 ```ruby
-pod 'JioTranslateCoreSDKiOS', '1.0.0-alpha.2'
+pod 'JioTranslateCoreSDKiOS', '1.0.0-alpha.3'
 ```
 
 ### Import SDK
@@ -73,44 +75,46 @@ import JioTranslateCoreSDKiOS
 Create and configure the instance of `JioTranslateManager`. 
 
 ```swift
-JioTranslateManager.shared.configure(server: .sit, jwt: jwt, userId: userId, gender: gender) //'male' or 'female'
+JioTranslateManager.shared.configure(server: .sit, jwt: jwt, userId: userId)
 ```
 
 | Property Name | Type  | Description  |
 | ------- | --- | --- |
 | server | JioTranslateServer | Server address, .sit or .prod |
 | jwt | String | JWT token |
-| gender | String | 'male' or 'female' |
+| userId | String | Unique id of the User |
 
 ### Speech to Text Translation
 
 Use this function to convert spoken language into written text.
 
 ```swift
-    public func startTextTranslationRecording(audioURL: URL, inputLanguage: JioTranslateCoreSDKiOS.SupportedLanguage, translateEngine: JioTranslateCoreSDKiOS.TranslateEngineType = .googleAPI, completion: @escaping (Result<String, JioTranslateCoreSDKiOS.CustomError>) -> Void)
+    public func startSpeechToText(audioFilePath: URL, inputLanguage: SupportedLanguage, translateEngine: TranlsateEngine? = nil, completion: @escaping (Result<String, CustomError>) -> Void)
 ```
 
 | Property Name | Type  | Description  |
 | ------- | --- | --- |
-| audioURL | URL | Send recorded audio file URL(Ex: recorded.wav) |
-| inputLanguage | SupportedLanguage | Language of the recorded audio, Ex: 'English', 'Telugu' |
-| translateEngine | TranslateEngineType | .googleAPI, .azure, .reverie |
+| audioFilePath | URL | Send recorded audio file path URL(Ex: recorded.wav) |
+| inputLanguage | SupportedLanguage | Language name of the recorded audio, Ex: 'English', 'Telugu' |
+| translateEngine | TranlsateEngine | .engine1, .engine2, .engine3 |
+| completion | Result<String, CustomError> | .success(let text), .failure(let error) |
 
 ### Text to Text Translation
 
 Use this function to translate text from one language to another.
 
 ```swift
-    public func translateText(inputText: String, inputLanguage: JioTranslateCoreSDKiOS.SupportedLanguage, translationLanguage: JioTranslateCoreSDKiOS.SupportedLanguage, translateEngine: JioTranslateCoreSDKiOS.TranslateEngineType = .googleAPI, isIndirectTranslation: Bool = false, completion: @escaping (Result<String, JioTranslateCoreSDKiOS.CustomError>) -> Void)
+    public func startTextTranslation(inputText: String, inputLanguage: SupportedLanguage, translationLanguage: SupportedLanguage, translateEngine: TranlsateEngine? = nil, isIndirectTranslation: Bool = false, completion: @escaping (Result<String, CustomError>) -> Void) 
 ```
 
 | Property Name | Type  | Description  |
 | ------- | --- | --- |
 | inputText | String | Input text to translate |
-| inputLanguage | SupportedLanguage | Language of the input text, Ex: 'English', 'Telugu' |
-| translationLanguage | SupportedLanguage | Language of the output translation text, Ex: 'Hindi', 'Telugu' |
-| translateEngine | TranslateEngineType | .googleAPI, .azure, .reverie |
+| inputLanguage | SupportedLanguage | Language name of the input text, Ex: 'English', 'Telugu' |
+| translationLanguage | SupportedLanguage | Language name of the output translation text, Ex: 'Hindi', 'Telugu' |
+| translateEngine | TranlsateEngine | .engine1, .engine2, .engine3 |
 | isIndirectTranslation | Bool | true or false |
+| completion | Result<String, CustomError> | .success(let text), .failure(let error) |
 
 
 ### Text to Speech Translation
@@ -118,16 +122,16 @@ Use this function to translate text from one language to another.
 Use this function to translate written text into spoken language.
 
 ```swift
-    public func synthesisToSpeaker(inputText: String, inputLanguage: JioTranslateCoreSDKiOS.SupportedLanguage, translateEngine: JioTranslateCoreSDKiOS.TranslateEngineType = .googleAPI, gender: String = "male", completion: @escaping (Result<String, JioTranslateCoreSDKiOS.CustomError>) -> Void)
+    public func startTextToSpeech(inputText: String, inputLanguage: SupportedLanguage, translateEngine: TranlsateEngine? = nil, gender: Gender, completion: @escaping (Result<String, CustomError>) -> Void)
 ```
 
 | Property Name | Type  | Description  |
 | ------- | --- | --- |
 | inputText | String | Input text to translate |
-| inputLanguage | SupportedLanguage | Language of the input text, Ex: 'English', 'Telugu' |
-| translateEngine | TranslateEngineType | .googleAPI, .azure, .reverie |
+| inputLanguage | SupportedLanguage | Language name of the input text, Ex: Ex: 'English', 'Telugu' |
+| translateEngine | TranlsateEngine | .engine1, .engine2, .engine3 |
 | gender | String | 'male' or 'female' |
-
+| completion | Result<String, CustomError> | .success(let audioContent), .failure(let error) |
 
 ## Troubleshooting
 
