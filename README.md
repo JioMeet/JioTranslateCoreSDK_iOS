@@ -21,7 +21,7 @@ JioTranslate CoreSDK iOS Demo App
 
 In this documentation, we'll guide you through the process of installation, Let's get started on your journey to Break Language barriers with translation of any language into your native tongue with JioTranslate CoreSDK!
 
-<img src="./Images/sampleApp.png" alt="image info" width="300" height="650">
+<img src="./images/sampleApp.png" alt="image info" width="300" height="650">
 
 ---
 
