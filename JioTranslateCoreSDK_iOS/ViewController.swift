@@ -32,6 +32,7 @@ class ViewController: UIViewController {
     private(set) var isSpeechStopped: Bool = false
     private var sourceLanguage: SupportedLanguage = SupportedLanguage(languageName: "English")
     private var translateLanguage: SupportedLanguage = SupportedLanguage(languageName: "Hindi")
+    var languages: [SupportedLanguage] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,6 +41,18 @@ class ViewController: UIViewController {
         let userId = "Add your userId"
         
         JioTranslateManager.shared.configure(server: .sit, jwt: jwt, userId: userId)
+        
+        //Fetch configuration and load languages on success
+        JioTranslateManager.shared.loadConfig {[weak self] result in
+            switch result {
+            case .success(_):
+                self?.languages = JioTranslateManager.shared.getSupportedLanguages()
+                print("Success")
+            case .failure(let failure):
+                print(failure.localizedDescription)
+                print("Error fetching config")
+            }
+        }
         
         translationTextView.layer.borderColor = UIColor.systemBlue.cgColor
         translationTextView.layer.cornerRadius = 16
@@ -124,7 +137,13 @@ class ViewController: UIViewController {
     }
     
     @objc func didTapLanguageActionFrom(_ sender: UITapGestureRecognizer) {
+        guard !languages.isEmpty else {
+            showErrorAlert(withMessage: "Languages list is not available at the moment. Please try again.")
+            return
+        }
+        
         let languageVC = LanguageVC()
+        languageVC.languages = languages
         let navVC = UINavigationController(rootViewController: languageVC)
         languageVC.didSelectLanguage = { language in
             if language.languageName == self.translateLanguage.languageName {
@@ -139,16 +158,17 @@ class ViewController: UIViewController {
             print("Selected Source Language: \(language.languageName)")
         }
         navVC.modalPresentationStyle = .overCurrentContext
-        
-        if !languageVC.languages.isEmpty {
-            present(navVC, animated: true, completion: nil)
-        } else {
-            showErrorAlert(withMessage: "Language list is not available at the moment. Please try again.")
-        }
+        present(navVC, animated: true, completion: nil)
     }
     
     @objc func didTapLanguageActionTo(_ sender: UITapGestureRecognizer) {
+        guard !languages.isEmpty else {
+            showErrorAlert(withMessage: "Languages list is not available at the moment. Please try again.")
+            return
+        }
+        
         let languageVC = LanguageVC()
+        languageVC.languages = languages
         let navVC = UINavigationController(rootViewController: languageVC)
         languageVC.didSelectLanguage = { language in
             if language.languageName == self.sourceLanguage.languageName {
@@ -164,12 +184,7 @@ class ViewController: UIViewController {
             print("Selected Translate Language: \(language.languageName)")
         }
         navVC.modalPresentationStyle = .overCurrentContext
-        
-        if !languageVC.languages.isEmpty {
-            present(navVC, animated: true, completion: nil)
-        } else {
-            showErrorAlert(withMessage: "Language list is not available at the moment. Please try again.")
-        }
+        present(navVC, animated: true, completion: nil)
     }
 }
 

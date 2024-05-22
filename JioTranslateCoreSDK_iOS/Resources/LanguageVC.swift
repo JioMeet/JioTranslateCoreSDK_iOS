@@ -10,7 +10,7 @@ import JioTranslateCoreSDKiOS
 
 class LanguageVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
-    var languages: [SupportedLanguage] = JioTranslateManager.shared.getSupportedLanguages()
+    var languages: [SupportedLanguage] = []
 
     var didSelectLanguage: ((SupportedLanguage) -> Void)?
     var selectedLanguageIndex: Int?

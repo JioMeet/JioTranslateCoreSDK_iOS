@@ -13,6 +13,7 @@ JioTranslate CoreSDK iOS Demo App
    - [Add SDK](#add-sdk)
    - [Import SDK](#import-sdk)
    - [Integrate SDK](#integrate-sdk)
+   - [Load Configuration](#load-configuration)
    - [Speech to Text Translation](#speech-to-text-translation)
    - [Text to Text Translation](#text-to-text-translation)
    - [Text to Speech Translation](#text-to-speech-translation)
@@ -59,7 +60,7 @@ Please add below permissions keys to your `Info.plist` file with proper descript
 Please add below pod to your Podfile and run command `pod install --repo-update --verbose`.
 
 ```ruby
-pod 'JioTranslateCoreSDKiOS', '1.0.0-alpha.4'
+pod 'JioTranslateCoreSDKiOS', '1.0.0-alpha.5'
 ```
 
 ### Import SDK
@@ -83,6 +84,16 @@ JioTranslateManager.shared.configure(server: .sit, jwt: jwt, userId: userId)
 | server | JioTranslateServer | Server address, .sit or .prod |
 | jwt | String | JWT token |
 | userId | String | Unique id of the User |
+
+### Load Configuration
+This method fetches the configuration data required for the SDK to function properly, upon successful loading, the list of supported languages can be obtained.
+```swift
+public func loadConfig(completion: @escaping (Result<String, CustomError>) -> Void)
+```
+
+| Property Name | Type  | Description  |
+| ------- | --- | --- |
+| completion | Result<String, CustomError> | .success(_), .failure(let error) |
 
 ### Speech to Text Translation
 
