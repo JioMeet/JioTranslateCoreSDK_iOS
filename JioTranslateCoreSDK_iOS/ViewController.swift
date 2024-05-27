@@ -33,6 +33,7 @@ class ViewController: UIViewController {
     private var sourceLanguage: SupportedLanguage = SupportedLanguage(languageName: "English")
     private var translateLanguage: SupportedLanguage = SupportedLanguage(languageName: "Hindi")
     var languages: [SupportedLanguage] = []
+    var audioContent = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -211,6 +212,25 @@ extension ViewController {
             }
         }
     }
+    
+     // pause Audio
+    @IBAction func didPressPauseButton(_ sender: UIButton) {
+        self.player?.pause()
+    }
+    
+     // Resume Audio
+    @IBAction func didPressResumeButton(_ sender: UIButton) {
+        self.player?.play()
+    }
+    
+    // save the audio content and replay when required
+    @IBAction func didPressReplayeButton(_ sender: UIButton) {
+        if audioContent.isEmpty {
+            self.playTheAudio(audioContent: audioContent )
+        } else {
+            showErrorAlert(withMessage: "Audio content is not available")
+        }
+    }
 }
 
 // MARK: - Text to Speech
@@ -223,6 +243,7 @@ extension ViewController {
                 let isTextEmpty = finalText.replacingOccurrences(of: " ", with: "").isEmpty
                 DispatchQueue.main.async {
                     if !isTextEmpty {
+                        self?.audioContent = text
                         self?.playTheAudio(audioContent: text)
                     } else {
                         self?.stopSpeech()
