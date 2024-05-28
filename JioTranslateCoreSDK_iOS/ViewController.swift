@@ -30,8 +30,8 @@ class ViewController: UIViewController {
     
     private var player: AVAudioPlayer?
     private(set) var isSpeechStopped: Bool = false
-    private var sourceLanguage: SupportedLanguage = SupportedLanguage(languageName: "English")
-    private var translateLanguage: SupportedLanguage = SupportedLanguage(languageName: "Hindi")
+    private var sourceLanguage: String = "English"
+    private var translateLanguage: String = "Hindi"
     var languages: [SupportedLanguage] = []
     var audioContent = ""
 
@@ -43,7 +43,6 @@ class ViewController: UIViewController {
         
         JioTranslateManager.shared.configure(server: .sit, jwt: jwt, userId: userId)
         
-        //Fetch configuration and load languages on success
         JioTranslateManager.shared.loadConfig {[weak self] result in
             switch result {
             case .success(_):
@@ -147,13 +146,7 @@ class ViewController: UIViewController {
         languageVC.languages = languages
         let navVC = UINavigationController(rootViewController: languageVC)
         languageVC.didSelectLanguage = { language in
-            if language.languageName == self.translateLanguage.languageName {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    self.showErrorAlert(withMessage: "The Input language and the Translate language should not be the same.")
-                }
-                return
-            }
-            self.sourceLanguage = language
+            self.sourceLanguage = language.languageName
             self.speakerLanguageLabel.text = language.languageName
             // Handle the selected language
             print("Selected Source Language: \(language.languageName)")
@@ -172,13 +165,7 @@ class ViewController: UIViewController {
         languageVC.languages = languages
         let navVC = UINavigationController(rootViewController: languageVC)
         languageVC.didSelectLanguage = { language in
-            if language.languageName == self.sourceLanguage.languageName {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    self.showErrorAlert(withMessage: "The Input language and the Translate language should not be the same.")
-                }
-                return
-            }
-            self.translateLanguage = language
+            self.translateLanguage = language.languageName
             self.listenerLanguageLabel.text = language.languageName
 
             // Handle the selected language
@@ -196,7 +183,7 @@ extension ViewController {
         
         audioRecorder.startRecording(url: audioFileURL, maxRecordingTime: 59.0, maxSilenceTime: 0.8, ignoreSilence: true, enableLiveTranslation: false) { [weak self] in
             
-            JioTranslateManager.shared.startSpeechToText(audioFilePath: audioFileURL, inputLanguage: self?.sourceLanguage ?? SupportedLanguage(languageName: "English"), translateEngine: .engine1) { result in
+            JioTranslateManager.shared.startSpeechToText(audioFilePath: audioFileURL, inputLanguage: self?.sourceLanguage ?? "English", translateEngine: .engine1) { result in
                 switch result {
                 case .success(let text):
                     let finalText = text.replacingOccurrences(of: "\n", with: "")
@@ -213,24 +200,24 @@ extension ViewController {
         }
     }
     
-     // pause Audio
-    @IBAction func didPressPauseButton(_ sender: UIButton) {
-        self.player?.pause()
-    }
-    
-     // Resume Audio
-    @IBAction func didPressResumeButton(_ sender: UIButton) {
-        self.player?.play()
-    }
-    
-    // save the audio content and replay when required
-    @IBAction func didPressReplayeButton(_ sender: UIButton) {
-        if audioContent.isEmpty {
-            self.playTheAudio(audioContent: audioContent )
-        } else {
-            showErrorAlert(withMessage: "Audio content is not available")
-        }
-    }
+    // pause Audio
+   @IBAction func didPressPauseButton(_ sender: UIButton) {
+       self.player?.pause()
+   }
+   
+    // Resume Audio
+   @IBAction func didPressResumeButton(_ sender: UIButton) {
+       self.player?.play()
+   }
+   
+   // save the audio content and replay when required
+   @IBAction func didPressReplayeButton(_ sender: UIButton) {
+       if audioContent.isEmpty {
+           self.playTheAudio(audioContent: audioContent )
+       } else {
+           showErrorAlert(withMessage: "Audio content is not available")
+       }
+   }
 }
 
 // MARK: - Text to Speech
@@ -243,7 +230,6 @@ extension ViewController {
                 let isTextEmpty = finalText.replacingOccurrences(of: " ", with: "").isEmpty
                 DispatchQueue.main.async {
                     if !isTextEmpty {
-                        self?.audioContent = text
                         self?.playTheAudio(audioContent: text)
                     } else {
                         self?.stopSpeech()
@@ -308,7 +294,7 @@ extension ViewController {
                 showErrorAlert(withMessage: "Received status code: \(code)")
             }
         case .otherError(let message):
-            showErrorAlert(withMessage: "Other error occurred: \(message)")
+            showErrorAlert(withMessage: "\(message)")
         @unknown default:
             showErrorAlert(withMessage: "Something went wrong, please try again!")
         }

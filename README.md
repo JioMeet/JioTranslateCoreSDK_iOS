@@ -60,7 +60,7 @@ Please add below permissions keys to your `Info.plist` file with proper descript
 Please add below pod to your Podfile and run command `pod install --repo-update --verbose`.
 
 ```ruby
-pod 'JioTranslateCoreSDKiOS', '1.0.0-alpha.5'
+pod 'JioTranslateCoreSDKiOS', '1.0.0'
 ```
 
 ### Import SDK
@@ -100,13 +100,13 @@ public func loadConfig(completion: @escaping (Result<String, CustomError>) -> Vo
 Use this function to convert spoken language into written text.
 
 ```swift
-    public func startSpeechToText(audioFilePath: URL, inputLanguage: SupportedLanguage, translateEngine: TranlsateEngine? = nil, completion: @escaping (Result<String, CustomError>) -> Void)
+    public func startSpeechToText(audioFilePath: URL, inputLanguage: String, translateEngine: TranlsateEngine? = nil, completion: @escaping (Result<String, CustomError>) -> Void)
 ```
 
 | Property Name | Type  | Description  |
 | ------- | --- | --- |
 | audioFilePath | URL | Send recorded audio file path URL(Ex: recorded.wav) |
-| inputLanguage | SupportedLanguage | Language name of the recorded audio, Ex: 'English', 'Telugu' |
+| inputLanguage | String | Language name of the recorded audio, Ex: 'English', 'Telugu' |
 | translateEngine | TranlsateEngine | .engine1, .engine2, .engine3 |
 | completion | Result<String, CustomError> | .success(let text), .failure(let error) |
 
@@ -115,14 +115,14 @@ Use this function to convert spoken language into written text.
 Use this function to translate text from one language to another.
 
 ```swift
-    public func startTextTranslation(inputText: String, inputLanguage: SupportedLanguage, translationLanguage: SupportedLanguage, translateEngine: TranlsateEngine? = nil, isIndirectTranslation: Bool = false, completion: @escaping (Result<String, CustomError>) -> Void) 
+    public func startTextTranslation(inputText: String, inputLanguage: String, translationLanguage: String, translateEngine: TranlsateEngine? = nil, isIndirectTranslation: Bool = false, completion: @escaping (Result<String, CustomError>) -> Void) 
 ```
 
 | Property Name | Type  | Description  |
 | ------- | --- | --- |
 | inputText | String | Input text to translate |
-| inputLanguage | SupportedLanguage | Language name of the input text, Ex: 'English', 'Telugu' |
-| translationLanguage | SupportedLanguage | Language name of the output translation text, Ex: 'Hindi', 'Telugu' |
+| inputLanguage | String | Language name of the input text, Ex: 'English', 'Telugu' |
+| translationLanguage | String | Language name of the output translation text, Ex: 'Hindi', 'Telugu' |
 | translateEngine | TranlsateEngine | .engine1, .engine2, .engine3 |
 | isIndirectTranslation | Bool | true or false |
 | completion | Result<String, CustomError> | .success(let text), .failure(let error) |
@@ -133,13 +133,13 @@ Use this function to translate text from one language to another.
 Use this function to translate written text into spoken language.
 
 ```swift
-    public func startTextToSpeech(inputText: String, inputLanguage: SupportedLanguage, translateEngine: TranlsateEngine? = nil, gender: Gender, completion: @escaping (Result<String, CustomError>) -> Void)
+    public func startTextToSpeech(inputText: String, inputLanguage: String, translateEngine: TranlsateEngine? = nil, gender: Gender, completion: @escaping (Result<String, CustomError>) -> Void)
 ```
 
 | Property Name | Type  | Description  |
 | ------- | --- | --- |
 | inputText | String | Input text to translate |
-| inputLanguage | SupportedLanguage | Language name of the input text, Ex: 'English', 'Telugu' |
+| inputLanguage | String | Language name of the input text, Ex: 'English', 'Telugu' |
 | translateEngine | TranlsateEngine | .engine1, .engine2, .engine3 |
 | gender | String | 'male' or 'female' |
 | completion | Result<String, CustomError> | .success(let audioContent), .failure(let error) |
