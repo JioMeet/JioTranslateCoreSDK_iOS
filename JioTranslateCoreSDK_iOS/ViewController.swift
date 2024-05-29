@@ -212,7 +212,7 @@ extension ViewController {
    
    // save the audio content and replay when required
    @IBAction func didPressReplayeButton(_ sender: UIButton) {
-       if audioContent.isEmpty {
+       if !audioContent.isEmpty {
            self.playTheAudio(audioContent: audioContent )
        } else {
            showErrorAlert(withMessage: "Audio content is not available")
