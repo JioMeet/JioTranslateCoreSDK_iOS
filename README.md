@@ -60,7 +60,7 @@ Please add below permissions keys to your `Info.plist` file with proper descript
 Please add below pod to your Podfile and run command `pod install --repo-update --verbose`.
 
 ```ruby
-pod 'JioTranslateCoreSDKiOS', '1.0.0'
+pod 'JioTranslateCoreSDKiOS', '1.2.0'
 ```
 
 ### Import SDK
@@ -107,7 +107,7 @@ Use this function to convert spoken language into written text.
 | ------- | --- | --- |
 | audioFilePath | URL | Send recorded audio file path URL(Ex: recorded.wav) |
 | inputLanguage | String | Language name of the recorded audio, Ex: 'English', 'Telugu' |
-| translateEngine | TranlsateEngine | .engine1, .engine2, .engine3 |
+| translateEngine | TranlsateEngine | .TRANSLATE_ENGINE_1, .TRANSLATE_ENGINE_2, .TRANSLATE_ENGINE_3 |
 | completion | Result<String, JioTranslateApiError> | .success(let text), .failure(let error) |
 
 ### Text to Text Translation
@@ -123,7 +123,7 @@ Use this function to translate text from one language to another.
 | inputText | String | Input text to translate |
 | inputLanguage | String | Language name of the input text, Ex: 'English', 'Telugu' |
 | translationLanguage | String | Language name of the output translation text, Ex: 'Hindi', 'Telugu' |
-| translateEngine | TranlsateEngine | .engine1, .engine2, .engine3 |
+| translateEngine | TranlsateEngine | .TRANSLATE_ENGINE_1, .TRANSLATE_ENGINE_2, .TRANSLATE_ENGINE_3 |
 | isIndirectTranslation | Bool | true or false |
 | completion | Result<String, JioTranslateApiError> | .success(let text), .failure(let error) |
 
@@ -140,7 +140,7 @@ Use this function to translate written text into spoken language.
 | ------- | --- | --- |
 | inputText | String | Input text to translate |
 | inputLanguage | String | Language name of the input text, Ex: 'English', 'Telugu' |
-| translateEngine | TranlsateEngine | .engine1, .engine2, .engine3 |
+| translateEngine | TranlsateEngine | .TRANSLATE_ENGINE_1, .TRANSLATE_ENGINE_2, .TRANSLATE_ENGINE_3 |
 | gender | String | 'male' or 'female' |
 | completion | Result<String, JioTranslateApiError> | .success(let audioContent), .failure(let error) |
 
