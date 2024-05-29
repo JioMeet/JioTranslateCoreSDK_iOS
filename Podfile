@@ -4,7 +4,7 @@
 target 'JioTranslateCoreSDK_iOS' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
-  pod 'JioTranslateCoreSDKiOS', '1.0.0'
+  pod 'JioTranslateCoreSDKiOS', '1.2.0'
 
   # Pods for JioTranslateCoreSDK_iOS
 
